@@ -2,6 +2,7 @@ const express = require('express');
 
 const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
+const router = require('./routes/users');
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -11,11 +12,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 
-app.get('/', (req, res) => {
-  res.send('SOMEBODY WAS TOLD ME')
-})
-
-
+app.use('/users', router);
 
 
 
