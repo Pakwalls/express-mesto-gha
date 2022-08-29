@@ -13,6 +13,7 @@ module.exports.getUser = (req, res) => {
     .catch(err => res.status(500).send({ message: err.message }));
 };
 
+
 module.exports.postUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
