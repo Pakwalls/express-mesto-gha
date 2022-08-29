@@ -1,25 +1,15 @@
 const express = require('express');
+const mongoose = require('mongoose');
 
 const { PORT = 3000 } = process.env;
-const mongoose = require('mongoose');
-const router = require('./routes/users');
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-    useFindAndModify: false
+  useNewUrlParser: true
 });
 
 
-app.use('/users', router);
-
-
-
-
-
-
-
+app.use('/users', require('./routes/users'));
 
 
 

@@ -1,22 +1,13 @@
-const User = require('../models/user');
-const { router } = require('express').Router();
+const router = require('express').Router();
+const { getUser, getUsers, postUser } = require('../controllers/users');
 
-//GET
-router.get('/users', (req, res) => {
-  User.find({})
-    .then(users => res.status(200).send(users))
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
-})
+//GET users
+router.get('/users', getUsers);
 
+//GET user
+router.get('/users/:userId', getUser);
 
-router.post('/', (req, res) => {
-  const { name, about } = req.body;
-
-  User.create({ name, about })
-    // возвращаем записанные в базу данные пользователю
-    .then(user => res.send({ data: user }))
-    // если данные не записались, вернём ошибку
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
-});
+//POST user
+router.post('/users', postUser);
 
 module.exports = router;
