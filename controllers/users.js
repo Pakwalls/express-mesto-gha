@@ -32,7 +32,7 @@ module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
   const userId = req.user._id;
 
-  User.findByIdAndUpdate(userId, { name, about })
+  User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
     .then(user => res.status(200).send(user))
     .catch((err) => validationFunction(err, res));
 };

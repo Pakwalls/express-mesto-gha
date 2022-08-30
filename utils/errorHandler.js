@@ -1,9 +1,8 @@
 module.exports.validationFunction = (err, res) => {
-  console.log(err);
-  if (err.name === 'ValidationError') {
+  if (err.name === 'ValidationError' || err.name === 'CastError') {
     return res.status(400).send({ "message": "Введены некорректные данные" });
   }
-  else if (err.name === 'NotFound' || err.name === 'CastError') {
+  else if (err.name === 'NotFound') {
     return res.status(404).send({ "message": "Карточка или пользователь не найден" });
   }
   else {

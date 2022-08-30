@@ -18,7 +18,13 @@ module.exports.postCard = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
-    .then(card => res.status(200).send(card))
+    .then(card => {
+      if (card) {
+        res.status(200).send(card)
+      } else {
+        return Promise.reject({ name: "NotFound" })
+      }
+    })
     .catch((err) => validationFunction(err, res));
 };
 
@@ -28,8 +34,14 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-  .then(card => res.status(200).send(card))
-  .catch((err) => validationFunction(err, res));
+    .then(card => {
+      if (card) {
+        res.status(200).send(card)
+      } else {
+        return Promise.reject({ name: "NotFound" })
+      }
+    })
+    .catch((err) => validationFunction(err, res));
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -38,6 +50,12 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-  .then(card => res.status(200).send(card))
-  .catch((err) => validationFunction(err, res));
+    .then(card => {
+      if (card) {
+        res.status(200).send(card)
+      } else {
+        return Promise.reject({ name: "NotFound" })
+      }
+    })
+    .catch((err) => validationFunction(err, res));
 };
