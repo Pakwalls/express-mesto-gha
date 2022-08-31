@@ -3,12 +3,7 @@ const Card = require('../models/card');
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены некорректные данные' });
-      }
-      return res.status(500).send({ message: err.message });
-    });
+    .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 module.exports.postCard = (req, res) => {
@@ -18,7 +13,7 @@ module.exports.postCard = (req, res) => {
   Card.create({ name, link, owner: userId })
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
       }
       return res.status(500).send({ message: err.message });
@@ -34,7 +29,7 @@ module.exports.deleteCard = (req, res) => {
       return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
       }
       return res.status(500).send({ message: err.message });
@@ -54,7 +49,7 @@ module.exports.likeCard = (req, res) => {
       return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
       }
       return res.status(500).send({ message: err.message });
@@ -74,7 +69,7 @@ module.exports.dislikeCard = (req, res) => {
       return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'CastError') {
         return res.status(400).send({ message: 'Введены некорректные данные' });
       }
       return res.status(500).send({ message: err.message });
