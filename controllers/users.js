@@ -1,4 +1,26 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'super-strong-secret',
+        { expiresIn: '7d' },
+      );
+      res.cookie('jwt', token, {
+        maxAge: 3600000,
+        httpOnly: true,
+      });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
+};
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -22,21 +44,36 @@ module.exports.getUser = (req, res) => {
     });
 };
 
-module.exports.postUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+module.exports.createUser = (req, res) => {
+  const {
+    name,
+    about,
+    avatar,
+    email,
+    password,
+  } = req.body;
 
-  User.create({ name, about, avatar })
-    .then((user) => {
-      if (user) {
-        return res.status(200).send(user);
-      }
-      return res.status(404).send({ message: 'Пользователь не найден' });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Введены некорректные данные' });
-      }
-      return res.status(500).send({ message: err.message });
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+        .then((user) => {
+          if (user) {
+            return res.status(200).send(user);
+          }
+          return res.status(404).send({ message: 'Пользователь не найден' });
+        })
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            return res.status(400).send({ message: 'Введены некорректные данные' });
+          }
+          return res.status(500).send({ message: err.message });
+        });
     });
 };
 
