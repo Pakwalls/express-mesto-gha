@@ -12,6 +12,7 @@ module.exports.getCards = (req, res, next) => {
 module.exports.postCard = (req, res, next) => {
   const { name, link } = req.body;
   const userId = req.user._id;
+  console.log(name, link);
 
   Card.create({ name, link, owner: userId })
     .then((card) => res.status(200).send(card))
