@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const { urlValidator, mailValidator } = require('./middlewares/validation');
+const { errorHandler } = require('./middlewares/errorHandler');
 
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
@@ -43,10 +44,7 @@ app.use('/', userRoutes);
 app.use('/', cardRoutes);
 
 app.use(errors());
-
-app.use((req, res) => {
-  res.status(404).send({ message: '404 - Страница не найдена' });
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
