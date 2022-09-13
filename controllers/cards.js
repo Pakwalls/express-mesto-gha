@@ -28,13 +28,16 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       if (card.owner.equals(req.user._id)) {
         return card.remove()
-          .then(() => res.send('Карточка удалена!'));
+          .then(() => res.send({ message: 'Карточка удалена!' }));
       }
       return next(new ForbiddenError('Нельзя удалять чужие карточки'));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Некорректные данные'));
+      }
+      if (err.status === 404) {
+        next(new NotFoundError('Карточка с указанным _id не найдена'));
       }
       next(err);
     });
