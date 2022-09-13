@@ -9,6 +9,7 @@ const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./utils/errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -42,6 +43,8 @@ app.use(auth);
 
 app.use('/', userRoutes);
 app.use('/', cardRoutes);
+
+app.use('/*', (req, res, next) => next(new NotFoundError('Страница не найдена')));
 
 app.use(errors());
 app.use(errorHandler);

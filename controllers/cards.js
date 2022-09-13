@@ -50,10 +50,8 @@ module.exports.likeCard = (req, res, next) => {
     { new: true },
   )
     .then((card) => {
-      if (card) {
-        return res.status(200).send(card);
-      }
-      return next(new NotFoundError('Карточка с указанным _id не найдена'));
+      if (card) res.status(200).send(card);
+      else next(new NotFoundError('Карточка с указанным _id не найдена'));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
