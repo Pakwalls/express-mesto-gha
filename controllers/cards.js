@@ -12,7 +12,6 @@ module.exports.getCards = (req, res, next) => {
 module.exports.postCard = (req, res, next) => {
   const { name, link } = req.body;
   const userId = req.user._id;
-  console.log(name, link);
 
   Card.create({ name, link, owner: userId })
     .then((card) => res.status(200).send(card))
@@ -27,8 +26,9 @@ module.exports.postCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
-      if (req.params.cardId === card.owner) {
-        return card.remove();
+      if (card.owner.equals(req.user._id)) {
+        return card.remove()
+          .then(() => res.send('Карточка удалена!'));
       }
       return next(new ForbiddenError('Нельзя удалять чужие карточки'));
     })
