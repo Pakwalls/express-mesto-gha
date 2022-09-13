@@ -21,12 +21,12 @@ module.exports.postCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
-      if (card) {
-        return res.status(200).send(card);
+      if (req.params.cardId === card.owner) {
+        return card.remove();
       }
-      return res.status(404).send({ message: 'Карточка с указанным _id не найдена' });
+      return res.status(404).send({ message: 'Нельзя удалять чужие карточки' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {

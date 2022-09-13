@@ -2,6 +2,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+module.exports.getMe = (req, res) => {
+  const decodedId = jwt.decode(req.cookies.jwt)._id;
+
+  User.findById(decodedId)
+    .then((user) => {
+      res.status(200).send(user);
+    })
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
+
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
 
@@ -15,7 +25,9 @@ module.exports.login = (req, res) => {
       res.cookie('jwt', token, {
         maxAge: 3600000,
         httpOnly: true,
+        sameSite: true,
       });
+      res.send(user);
     })
     .catch((err) => {
       res.status(401).send({ message: err.message });
@@ -24,7 +36,7 @@ module.exports.login = (req, res) => {
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send({ data: users }))
+    .then((users) => res.status(200).send(users))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
 
@@ -63,10 +75,7 @@ module.exports.createUser = (req, res) => {
         password: hash,
       })
         .then((user) => {
-          if (user) {
-            return res.status(200).send(user);
-          }
-          return res.status(404).send({ message: 'Пользователь не найден' });
+          res.status(200).send(user);
         })
         .catch((err) => {
           if (err.name === 'ValidationError') {
