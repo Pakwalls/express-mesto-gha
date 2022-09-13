@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const linkRegex = require('../utils/linkValidation');
+const { linkRegex } = require('../utils/linkValidation');
 
 const cardSchema = new mongoose.Schema({
   name: {
