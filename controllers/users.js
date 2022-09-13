@@ -1,18 +1,22 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const BadRequestError = require('../utils/errors/BadRequestError');
+const NotFoundError = require('../utils/errors/NotFoundError');
+const UnauthorizedError = require('../utils/errors/UnauthorizedError');
+const ConflictError = require('../utils/errors/ConflictError');
 
-module.exports.getMe = (req, res) => {
+module.exports.getMe = (req, res, next) => {
   const decodedId = jwt.decode(req.cookies.jwt)._id;
 
   User.findById(decodedId)
     .then((user) => {
       res.status(200).send(user);
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -29,34 +33,34 @@ module.exports.login = (req, res) => {
       });
       res.send(user);
     })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
+    .catch(() => {
+      next(new UnauthorizedError('Некорректные данные'));
     });
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(200).send(users))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (user) {
         return res.status(200).send(user);
       }
-      return res.status(404).send({ message: 'Пользователь не найден' });
+      return next(new NotFoundError('Пользователь не найден'));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены некорректные данные' });
+        return next(new BadRequestError('Введены некорректные данные'));
       }
-      return res.status(500).send({ message: err.message });
+      return next(err);
     });
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -85,17 +89,17 @@ module.exports.createUser = (req, res) => {
         })
         .catch((err) => {
           if (err.name === 'ValidationError') {
-            return res.status(400).send({ message: 'Введены некорректные данные' });
+            next(new BadRequestError('Введены некорректные данные'));
           }
           if (err.code === 11000) {
-            return res.status(409).send({ message: 'Пользователь с такими данными уже существует' });
+            next(new ConflictError('Пользователь с такими данными уже существует'));
           }
-          return res.status(500).send({ message: err.message });
+          next(err);
         });
     });
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   const userId = req.user._id;
 
@@ -104,17 +108,17 @@ module.exports.updateUser = (req, res) => {
       if (user) {
         return res.status(200).send(user);
       }
-      return res.status(404).send({ message: 'Пользователь не найден' });
+      return next(new NotFoundError('Пользователь не найден'));
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены некорректные данные' });
+        return next(new BadRequestError('Введены некорректные данные'));
       }
-      return res.status(500).send({ message: err.message });
+      return next(err);
     });
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const userId = req.user._id;
 
@@ -123,12 +127,12 @@ module.exports.updateAvatar = (req, res) => {
       if (user) {
         return res.status(200).send(user);
       }
-      return res.status(404).send({ message: 'Карточка или пользователь не найден' });
+      return next(new NotFoundError('Пользователь или карточка не найден'));
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return res.status(400).send({ message: 'Введены некорректные данные' });
+        return next(new BadRequestError('Введены некорректные данные'));
       }
-      return res.status(500).send({ message: err.message });
+      return next(err);
     });
 };
