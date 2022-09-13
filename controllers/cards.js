@@ -1,9 +1,9 @@
 const Card = require('../models/card');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
 module.exports.postCard = (req, res) => {

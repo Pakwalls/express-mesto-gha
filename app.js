@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 const { urlValidator, mailValidator } = require('./middlewares/validation');
-const { errorHandler } = require('./middlewares/errorHandler');
+const errorHandler = require('./middlewares/errorHandler');
 
 const userRoutes = require('./routes/users');
 const cardRoutes = require('./routes/cards');
