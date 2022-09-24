@@ -23,7 +23,7 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        'super-strong-secret',
+        process.env.JWT_SECRET,
         { expiresIn: '7d' },
       );
       res.cookie('jwt', token, {
